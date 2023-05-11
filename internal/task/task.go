@@ -1,5 +1,7 @@
 package task
 
+import "landau/internal/files"
+
 //引擎返回结果
 type Scan_State int
 
@@ -16,4 +18,5 @@ type Config struct {
 
 func New(conf Config) {
 
+	files.New(conf.OutPutPath)
 }

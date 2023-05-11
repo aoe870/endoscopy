@@ -22,11 +22,9 @@ type HttpAddTask struct {
 }
 
 type operation struct {
-	Input             string `json:"inPut"`
-	OutPut            string `json:"outPut"`
-	TaskId            int64  `json:"task"`
-	IsBuild           bool   `json:"isBuild"`
-	IsDevDependencies bool   `json:"isDevDependencies"`
+	Input  string `json:"inPut"`
+	OutPut string `json:"outPut"`
+	TaskId int64  `json:"task"`
 }
 
 type HttpTaskResponse struct {

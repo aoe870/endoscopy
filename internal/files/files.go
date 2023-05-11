@@ -52,26 +52,15 @@ func (metadata FileMetadata) readFile(path string) {
 			Node.FileType = File
 
 			// 判断是否为压缩文件
-			input, _ := os.ReadFile(p)
-			format, input, err := archiver.Identify(p, input)
+			f, _ := os.Open(p)
+			format, input, err := archiver.Identify(p, f)
 			if err != nil {
-				return err
+				fmt.Println()
+			} else {
+				fmt.Println()
 			}
-
-			if ex, ok := format.(archiver.Extractor); ok {
-				// ... proceed to extract
-			}
-
-			// or maybe it's compressed and you want to decompress it?
-			if decom, ok := format.(archiver.Decompressor); ok {
-				rc, err := decom.OpenReader(unknownFile)
-				if err != nil {
-					return err
-				}
-				defer rc.Close()
-
-				// read from rc to get decompressed data
-			}
+			fmt.Println(format)
+			fmt.Println(input)
 
 			return nil
 		})

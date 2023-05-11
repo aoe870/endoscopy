@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"landau/internal/logs"
+	"landau/internal/task"
 	"net/http"
 	"strconv"
 )
@@ -16,7 +17,7 @@ type server struct {
 }
 
 func NewServer(adders, port string) *server {
-	logs.Info("Createing Server")
+	logs.Info("Creating Server")
 	r := gin.Default()
 	s := &server{
 		s:       r,
@@ -43,9 +44,8 @@ func (s *server) httpInit(c *gin.Context) {
 
 func (s *server) httpPostAddTask(c *gin.Context) {
 	param := HttpAddTask{}
-	c.BindJSON(&param)
-
-	if param.Msg.Input == "" {
+	err := c.BindJSON(&param)
+	if err != nil {
 		logs.Error(errors.New(fmt.Sprintf(" Param InPut Is %s", param.Msg.Input)))
 		c.JSON(http.StatusOK, HttpTaskResponse{Code: AddTaskError, Msg: "Param Error"})
 		fmt.Println(c.Request.Body)
@@ -58,6 +58,14 @@ func (s *server) httpPostAddTask(c *gin.Context) {
 	}
 
 	logs.Info("receive new task: Path: " + param.Msg.Input + " TaskId: " + strconv.FormatInt(param.Msg.TaskId, 10))
+
+	taskConfig := task.Config{
+		TaskID:     strconv.FormatInt(param.Msg.TaskId, 10),
+		OutPutPath: param.Msg.OutPut,
+		InPutPath:  param.Msg.Input,
+	}
+
+	go task.New(taskConfig)
 
 	c.JSON(http.StatusOK, HttpTaskResponse{
 		Code: AddTaskSucceed,
