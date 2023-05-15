@@ -18,5 +18,9 @@ type Config struct {
 
 func New(conf Config) {
 
-	files.New(conf.OutPutPath)
+	metadata, err := files.New(conf.InPutPath)
+	if err != nil {
+		return
+	}
+
 }

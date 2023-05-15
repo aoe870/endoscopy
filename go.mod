@@ -3,7 +3,9 @@ module landau
 go 1.18
 
 require (
+	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
 	github.com/gin-gonic/gin v1.9.0
+	github.com/klauspost/compress v1.15.9
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/pkg/errors v0.9.1
 	github.com/urfave/cli/v2 v2.25.3
@@ -28,7 +30,6 @@ require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect

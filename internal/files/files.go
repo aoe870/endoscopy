@@ -1,7 +1,7 @@
 package files
 
 import (
-	"fmt"
+	"bytes"
 	"github.com/mholt/archiver/v4"
 	"io/fs"
 	"os"
@@ -11,9 +11,10 @@ import (
 type FileType int
 
 const (
-	File     FileType = 1
-	Ctalogue FileType = 2
-	Archived FileType = 3
+	File       FileType = 1
+	Ctalogue   FileType = 2
+	Archived   FileType = 3
+	BinaryFile FileType = 4
 )
 
 type FileMetadata struct {
@@ -31,46 +32,59 @@ func New(path string) (FileMetadata, error) {
 		return file, err
 	}
 
-	file.readFile(path)
+	file.readFile("", path)
 
 	return file, nil
 }
 
-func (metadata FileMetadata) readFile(path string) {
-	f, _ := os.Stat(path)
-	if f.IsDir() {
-		err := filepath.WalkDir(path, func(p string, d fs.DirEntry, err error) error {
-			Node := Node{
-				Name: d.Name(),
-				Path: p,
+func (metadata FileMetadata) readFile(prePath, path string) {
+
+	err := filepath.WalkDir(path, func(p string, d fs.DirEntry, err error) error {
+		Node := Node{
+			Name: d.Name(),
+			Path: p,
+		}
+		metadata.Table = append(metadata.Table, &Node)
+		if d.IsDir() {
+			Node.FileType = Ctalogue
+			return nil
+		}
+		Node.FileType = File
+
+		// 判断是否为压缩文件
+		f, _ := os.Open(p)
+		fn, _ := f.Stat()
+		defer f.Close()
+		_, _, err = archiver.Identify(p, f)
+		if err != nil {
+			buff := bytes.NewBuffer(make([]byte, 0, fn.Size()))
+			buff.ReadFrom(f)
+			Node.Data = &FileData{
+				buff.Bytes(),
 			}
-			metadata.Table = append(metadata.Table, &Node)
-			if d.IsDir() {
-				Node.FileType = Ctalogue
+		} else {
+			//判断文件大小
+			if fn.Size() > 1*1024*1024*1024 {
+				tempPath, _ := decompressor(p)
+				metadata.readFile(p, tempPath)
+				defer os.Remove(tempPath)
 				return nil
 			}
-			Node.FileType = File
-
-			// 判断是否为压缩文件
-			f, _ := os.Open(p)
-			format, input, err := archiver.Identify(p, f)
+			//读取压缩文件
+			table, err := readArchives(prePath, p)
 			if err != nil {
-				fmt.Println()
-			} else {
-				fmt.Println()
+				return err
 			}
-			fmt.Println(format)
-			fmt.Println(input)
-
-			return nil
-		})
-
-		if err != nil {
-			fmt.Println(err)
+			metadata.Table = append(metadata.Table, table...)
+			Node.FileType = Archived
 		}
 
-	} else {
-		// 读取文件
+		return nil
+	})
 
+	if err != nil {
+		return
 	}
+
+	return
 }
