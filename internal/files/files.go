@@ -37,7 +37,7 @@ func New(path string) (FileMetadata, error) {
 	return file, nil
 }
 
-func (metadata FileMetadata) readFile(prePath, path string) {
+func (metadata *FileMetadata) readFile(prePath, path string) {
 
 	err := filepath.WalkDir(path, func(p string, d fs.DirEntry, err error) error {
 		Node := Node{

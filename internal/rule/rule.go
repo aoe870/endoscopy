@@ -1,22 +1,33 @@
 package rule
 
-import "landau/internal/files"
+import (
+	"landau/internal/files"
+)
 
-type ScanState int
+type RuleType string
 
 const (
-	ScanSeccess ScanState = 1
-	ScanFail    ScanState = 2
+	Email RuleType = "email"
+	Ipv4  RuleType = "ipv4"
+	Ipv6  RuleType = "ipv6"
+	URL   RuleType = "url"
 )
 
 type Rule interface {
-	// 检查是否符合规则
 	Check(f *files.Node) ScanResult
+
+	GetRuleType() RuleType
 }
 
 type ScanResult struct {
-	State   ScanState //是否检出
-	Source  string    //检出来源
-	Content string    //检出内容
-	Line    int       //检出行
+	Total    int    //是否检出
+	Source   string //检出来源
+	Tags     []Tag
+	RuleType RuleType //规则类型
+
+}
+
+type Tag struct {
+	Content string //检出内容
+	Line    int    //检出行
 }

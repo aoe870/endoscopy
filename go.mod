@@ -3,8 +3,9 @@ module landau
 go 1.18
 
 require (
-	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
+	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/gin-gonic/gin v1.9.0
+	github.com/goccy/go-json v0.10.0
 	github.com/klauspost/compress v1.15.9
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/pkg/errors v0.9.1
@@ -25,7 +26,6 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
-	github.com/goccy/go-json v0.10.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect

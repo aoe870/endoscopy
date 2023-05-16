@@ -1,4 +1,4 @@
-package url
+package ipv4
 
 import (
 	"github.com/asaskevich/govalidator"
@@ -13,8 +13,7 @@ type Rule struct {
 
 func New() Rule {
 	return Rule{
-		//匹配url正则
-		Regex: regexp.MustCompile(govalidator.URL),
+		Regex: regexp.MustCompile(govalidator.IP),
 	}
 }
 
@@ -24,19 +23,18 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 	result.Source = f.Path
 	result.RuleType = r.GetRuleType()
 
-	//rsa私钥正则
-	regexp.MustCompile(``)
-
 	//检查是否符合规则
 	for _, match := range r.Regex.FindAllStringSubmatch(string(f.Data.Data), -1) {
-		result.Total++
-		result.Tags = append(result.Tags, rule.Tag{
-			Content: match[0],
-		})
+		if govalidator.IsIPv4(match[0]) {
+			result.Total++
+			result.Tags = append(result.Tags, rule.Tag{
+				Content: match[0],
+			})
+		}
 	}
 	return result
 }
 
 func (r Rule) GetRuleType() rule.RuleType {
-	return rule.URL
+	return rule.Ipv4
 }

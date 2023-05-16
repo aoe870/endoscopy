@@ -6,10 +6,10 @@ const (
 	AddTask PolicyType = 100 //添加任务
 )
 
-//任务请求结果响应
+// 任务请求结果响应
 const (
-	AddTaskSucceed PolicyType = 200 //任务下发/中止成功
-	AddTaskError   PolicyType = 201 //任务下发/中止失败
+	AddTaskSucceed PolicyType = 200 //任务下发
+	AddTaskError   PolicyType = 201 //任务下发失败
 )
 
 ///////////////任务下发相关结构
