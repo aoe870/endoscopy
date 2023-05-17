@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/klauspost/compress/zip"
-	"github.com/mholt/archiver/v4"
-	"github.com/pkg/errors"
 	"io"
 	"io/fs"
 	"io/ioutil"
@@ -14,6 +11,10 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/klauspost/compress/zip"
+	"github.com/mholt/archiver/v4"
+	"github.com/pkg/errors"
 )
 
 type Node struct {
@@ -72,7 +73,7 @@ func readArchives(prePath, path string) ([]*Node, error) {
 		fn.Close()
 		format, _, err := archiver.Identify(p, fn)
 		if format != nil {
-			path, _ := ioutil.TempDir("", "landau-"+strings.ReplaceAll(p, "/", "-"))
+			path, _ := ioutil.TempDir("", "endoscopy-"+strings.ReplaceAll(p, "/", "-"))
 			path = filepath.Join(path, d.Name())
 			_, err := createFile(path, buff.Bytes())
 			if err == nil {
@@ -200,7 +201,7 @@ func createFile(path string, data []byte) (*os.File, error) {
 }
 
 func createTempDir() string {
-	name := "landau" + time.Now().Format("20060102150405")
+	name := "endoscopy" + time.Now().Format("20060102150405")
 	path, err := ioutil.TempDir("", name)
 	if err != nil {
 		return createTempDir()

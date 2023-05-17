@@ -1,10 +1,11 @@
 package app
 
 import (
+	"endoscopy/internal/arge"
+	"endoscopy/internal/logs"
+	"endoscopy/internal/server"
+
 	"github.com/urfave/cli/v2"
-	"landau/internal/arge"
-	"landau/internal/logs"
-	"landau/internal/server"
 )
 
 func New() (*cli.App, error) {
@@ -18,7 +19,10 @@ func New() (*cli.App, error) {
 }
 
 func runServer(c *cli.Context) error {
-	arge.New(c)
+	err := arge.New(c)
+	if err != nil {
+		return err
+	}
 	logs.Info("Server Start  -- address: " + arge.Address + "  -- port: " + arge.Port)
 	s := server.NewServer(arge.Address, arge.Port)
 	s.RunServer()

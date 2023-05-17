@@ -1,7 +1,7 @@
 package rule
 
 import (
-	"landau/internal/files"
+	"endoscopy/internal/files"
 )
 
 type RuleType string

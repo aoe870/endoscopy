@@ -1,13 +1,14 @@
 package server
 
 import (
+	"endoscopy/internal/logs"
+	"endoscopy/internal/task"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
-	"landau/internal/logs"
-	"landau/internal/task"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 )
 
 type server struct {
@@ -30,7 +31,7 @@ func NewServer(adders, port string) *server {
 func (s *server) RunServer() {
 	//s.pool.Run()
 	s.s.GET("/", s.httpInit)
-	s.s.POST("landau", s.httpPostAddTask)
+	s.s.POST("endoscopy", s.httpPostAddTask)
 	err := s.s.Run(":" + s.port)
 	if err != nil {
 		logs.Error(err)
@@ -39,7 +40,7 @@ func (s *server) RunServer() {
 }
 
 func (s *server) httpInit(c *gin.Context) {
-	c.String(http.StatusOK, "hello go landau")
+	c.String(http.StatusOK, "hello go endoscopy")
 }
 
 func (s *server) httpPostAddTask(c *gin.Context) {
@@ -63,6 +64,7 @@ func (s *server) httpPostAddTask(c *gin.Context) {
 		TaskID:     strconv.FormatInt(param.Msg.TaskId, 10),
 		OutPutPath: param.Msg.OutPut,
 		InPutPath:  param.Msg.Input,
+		Platform:   "http://" + s.address + ":8002/api/web/whitebox/callback",
 	}
 
 	go task.New(taskConfig)

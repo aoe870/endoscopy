@@ -1,8 +1,8 @@
 package logs
 
 import (
+	"endoscopy/internal/version"
 	"fmt"
-	"landau/internal/version"
 	"log"
 	"os"
 	"path"

@@ -1,9 +1,9 @@
 package email
 
 import (
+	"endoscopy/internal/files"
+	"endoscopy/internal/rule"
 	"github.com/asaskevich/govalidator"
-	"landau/internal/files"
-	"landau/internal/rule"
 	"regexp"
 )
 
@@ -14,7 +14,7 @@ type Rule struct {
 func New() Rule {
 	return Rule{
 		//匹配邮箱正则
-		Regex: regexp.MustCompile(govalidator.Email),
+		Regex: regexp.MustCompile(`[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+`),
 	}
 }
 
@@ -26,10 +26,12 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 
 	//检查是否符合规则
 	for _, match := range r.Regex.FindAllStringSubmatch(string(f.Data.Data), -1) {
-		result.Total++
-		result.Tags = append(result.Tags, rule.Tag{
-			Content: match[0],
-		})
+		if govalidator.IsEmail(match[0]) {
+			result.Total++
+			result.Tags = append(result.Tags, rule.Tag{
+				Content: match[0],
+			})
+		}
 	}
 	return result
 }

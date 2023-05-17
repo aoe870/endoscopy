@@ -1,4 +1,4 @@
-module landau
+module endoscopy
 
 go 1.18
 

@@ -1,10 +1,11 @@
 package ipv6
 
 import (
-	"github.com/asaskevich/govalidator"
-	"landau/internal/files"
-	"landau/internal/rule"
+	"endoscopy/internal/files"
+	"endoscopy/internal/rule"
 	"regexp"
+
+	"github.com/asaskevich/govalidator"
 )
 
 type Rule struct {

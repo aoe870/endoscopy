@@ -1,10 +1,11 @@
 package arge
 
 import (
+	"endoscopy/internal/logs"
+	"os"
+
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
-	"landau/internal/logs"
-	"os"
 )
 
 var (

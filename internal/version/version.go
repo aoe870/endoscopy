@@ -7,7 +7,7 @@ import (
 
 var Version = "v1.0.1"
 
-func RunVserion(c *cli.Context) error {
+func RunVersion(c *cli.Context) error {
 	fmt.Println(Version)
 	return nil
 }

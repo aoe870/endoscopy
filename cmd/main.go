@@ -1,8 +1,8 @@
 package main
 
 import (
-	"landau/internal/app"
-	"landau/internal/logs"
+	"endoscopy/internal/app"
+	"endoscopy/internal/logs"
 	"os"
 )
 
