@@ -4,9 +4,10 @@
 
 <p align="center">
     <a href="/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-    <img alt="Github Test" src="https://github.com/zricethezav/gitleaks/actions/workflows/test.yml/badge.svg">  
     <a href="https://goreportcard.com/report/github.com/mingrammer/commonregex"><img src="https://goreportcard.com/badge/github.com/mingrammer/commonregex"/></a>
-    <img src="https://img.shields.io/twitter/follow/zricethezav?label=Follow%20zricethezav&style=social&color=blue" alt="Follow @taotao01114978" />
+    <a href="https://twitter.com/intent/follow?screen_name=taotao01114978">
+		  <img src="https://img.shields.io/twitter/follow/taotao01114978?label=Follow%20taotao01114978&style=social&color=blue" alt="Follow @taotao01114978" />
+    </a>
 </p>
 <p align="center">
   A tool written in go to detect sensitive information
