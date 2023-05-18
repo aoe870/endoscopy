@@ -4,16 +4,16 @@ import (
 	"os"
 )
 
-func New(outPath string, data []byte) {
+func New(outPath string, data []byte) error {
 
 	fd, err := os.Create(outPath)
 	defer fd.Close()
 	if err != nil {
-		return
+		return err
 	}
 	_, err = fd.Write(data)
 	if err != nil {
-		return
+		return err
 	}
-	return
+	return nil
 }

@@ -2,18 +2,21 @@ package arge
 
 import (
 	"endoscopy/internal/logs"
-	"os"
-
-	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
+	"os"
+	"path/filepath"
 )
 
 var (
 	Log string
 
-	//server
+	// server
 	Port    string
 	Address string
+
+	// cli
+	Path   string
+	Output string
 )
 
 func New(c *cli.Context) error {
@@ -22,25 +25,28 @@ func New(c *cli.Context) error {
 	if Log != "" {
 		logs.New(Log, true)
 	} else {
-		logs.New("analyzer.log", false)
+		logs.New("endoscopy.log", false)
 	}
 
-	//server
-	Port = c.String("port")
-	var env_ip string
-	env_ip = os.Getenv("IP_SCA_PLATFORM")
-	if len(env_ip) > 4 {
-		Address = env_ip
+	// cli
+	if c.Command.Name == "cli" {
+		if c.String("path") != "" {
+			dir, filename := filepath.Split(c.String("path"))
+			if len(filename) > 0 {
+				Path = c.String("path")
+			} else {
+				if dir == "/" {
+					Path = dir
+				} else {
+					Path = dir[0 : len(dir)-1]
+				}
+			}
+		}
+		Output = c.String("output")
 	} else {
-		Address = c.String("address")
+		//server
+		Address = os.Getenv("IP_SCA_PLATFORM")
 	}
-	if Address == "" {
-		return errors.New("none address")
-	}
-	if Address == "" {
-		return errors.New("none address")
-	}
-
 	//获取日志信息
 	Log = c.String("log")
 

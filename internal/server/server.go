@@ -5,6 +5,7 @@ import (
 	"endoscopy/internal/task"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -61,12 +62,11 @@ func (s *server) httpPostAddTask(c *gin.Context) {
 	logs.Info("receive new task: Path: " + param.Msg.Input + " TaskId: " + strconv.FormatInt(param.Msg.TaskId, 10))
 
 	taskConfig := task.Config{
-		TaskID:     strconv.FormatInt(param.Msg.TaskId, 10),
-		OutPutPath: param.Msg.OutPut,
-		InPutPath:  param.Msg.Input,
-		Platform:   "http://" + s.address + ":8002/api/web/whitebox/callback",
+		TaskID:    strconv.FormatInt(param.Msg.TaskId, 10),
+		InPutPath: param.Msg.Input,
+		Platform:  "http://" + s.address + ":8002/api/web/whitebox/callback",
 	}
-
+	taskConfig.OutPutPath = filepath.Join(param.Msg.OutPut, "endoscopy-"+taskConfig.TaskID+".json")
 	go task.New(taskConfig)
 
 	c.JSON(http.StatusOK, HttpTaskResponse{

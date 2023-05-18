@@ -1,20 +1,17 @@
 package task
 
 import (
-	"bytes"
 	"endoscopy/internal/files"
+	"endoscopy/internal/logs"
 	"endoscopy/internal/report"
 	"endoscopy/internal/rule"
 	"endoscopy/internal/rule/email"
 	"endoscopy/internal/rule/ipv4"
 	"endoscopy/internal/rule/ipv6"
 	"endoscopy/internal/rule/url"
+	"fmt"
 	"github.com/goccy/go-json"
 	"github.com/pkg/errors"
-	"net/http"
-	u "net/url"
-	"path/filepath"
-	"strconv"
 	"time"
 )
 
@@ -35,14 +32,12 @@ type Config struct {
 
 type State struct {
 	ElapsedTime string                   `json:"elapsedTime"`
-	Info        map[rule.RuleType][]Info `json:"infos"`
-	TaskId      string                   `json:"taskId"`
 	StartTime   time.Time                `json:"startTile"`
 	InPut       string                   `json:"inPath"`
 	State       string                   `json:"state"`
 	OutPut      string                   `json:"outPut"`
-	Msg         string
-	Platform    string
+	Info        map[rule.RuleType][]Info `json:"infos"`
+	TaskId      string
 }
 
 type Info struct {
@@ -62,6 +57,7 @@ func (i *Info) To(table []rule.ScanResult) {
 
 func New(conf Config) {
 
+	logs.Info("Start Task: " + conf.TaskID)
 	Rules := []rule.Rule{
 		email.New(),
 		ipv4.New(),
@@ -74,21 +70,11 @@ func New(conf Config) {
 	taskState.State = "success"
 	taskState.InPut = conf.InPutPath
 	taskState.OutPut = conf.OutPutPath
-	taskState.Platform = conf.Platform
 	taskState.Info = make(map[rule.RuleType][]Info)
-	defer func() {
-		if len(taskState.Platform) <= 0 {
-			return
-		}
-		err := TaskCallBack(taskState)
-		if err != nil {
-			return
-		}
-	}()
 	metadata, err := files.New(conf.InPutPath)
 	if err != nil {
 		taskState.State = "fail"
-		taskState.Msg = err.Error()
+		logs.Error(errors.Wrap(err, "task fail:"+err.Error()))
 		return
 	}
 
@@ -102,7 +88,6 @@ func New(conf Config) {
 			if scan.Total <= 0 {
 				continue
 			}
-
 			scanTable = append(scanTable, scan)
 		}
 
@@ -113,61 +98,24 @@ func New(conf Config) {
 		info.To(scanTable)
 		taskState.Info[r.GetRuleType()] = append(taskState.Info[r.GetRuleType()], info)
 	}
-
 	taskState.ElapsedTime = time.Now().Sub(taskState.StartTime).String()
 	//TODO 保存结果
 	data, err := json.Marshal(taskState)
 	if err != nil {
 		return
 	}
-	output := filepath.Join(conf.OutPutPath, "endoscopy-"+conf.TaskID+".json")
-	report.New(output, data)
 
-	//通知平台
+	logs.Info(" scan end")
+	if conf.OutPutPath == "" {
+		fmt.Println(string(data))
+	} else {
+		err := report.New(conf.OutPutPath, data)
+		if err != nil {
+			logs.Error(errors.Wrap(err, "save report fail"))
+			return
+		}
+		logs.Info("save report :" + conf.OutPutPath)
+	}
 
 	return
-}
-
-// 将分析结果发送到平台
-func TaskCallBack(state State) error {
-
-	params := u.Values{}
-	URL, err := u.Parse(state.Platform)
-	if err != nil {
-		return err
-	}
-	URL.RawQuery = params.Encode()
-	client := http.Client{
-		Timeout: 5 * time.Second,
-	}
-
-	type platform struct {
-		TaskID     int64  `json:"taskId"`
-		ReportPath string `json:"reportPath"`
-		Msg        string `json:"msg"`
-		Code       int    `json:"code"`
-	}
-	p := platform{
-		ReportPath: state.OutPut,
-		Msg:        state.Msg,
-	}
-	i, err := strconv.ParseInt(state.TaskId, 10, 64)
-	if err != nil {
-		err = errors.New("TaskID:" + state.TaskId + "TaskID转换失败")
-		return err
-	}
-	p.TaskID = i
-
-	byteData, err := json.Marshal(p)
-	if err != nil {
-		return err
-	}
-	response, err := client.Post(URL.String(), "application/json;charset=utf-8", bytes.NewBuffer(byteData))
-	if err != nil {
-		return err
-	}
-	if response.StatusCode == 200 {
-		return nil
-	}
-	return errors.New("TaskID:" + state.TaskId + " task request fail")
 }

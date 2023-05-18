@@ -14,7 +14,8 @@ type Rule struct {
 
 func New() Rule {
 	return Rule{
-		Regex: regexp.MustCompile(govalidator.IP),
+		//ipv4正则
+		Regex: regexp.MustCompile(`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`),
 	}
 }
 
