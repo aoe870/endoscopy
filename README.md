@@ -58,12 +58,12 @@ go get github.com/aoe870/endoscopy.git
 ```
 
 if you want build binary file, you can use this command
-#  use build shell script
+###  use build shell script
 ``` 
 ./build.sh
 ```
 
-#  use go build
+###  use go build
 ```
 go build -o endoscopy cmd/main.go
 ```
