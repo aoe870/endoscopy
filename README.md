@@ -3,17 +3,17 @@
 <h1 align="center">Endoscopy</h1>
 
 <p align="center">
-  <a href="/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
-  <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fmingrammer%2Fcommonregex?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmingrammer%2Fcommonregex.svg?type=shield"/></a>
-  <a href="https://godoc.org/github.com/mingrammer/commonregex"><img src="https://godoc.org/github.com/mingrammer/commonregex?status.svg"/></a>
-  <a href="https://goreportcard.com/report/github.com/mingrammer/commonregex"><img src="https://goreportcard.com/badge/github.com/mingrammer/commonregex"/></a>
-  <a href="https://codecov.io/gh/mingrammer/commonregex"><img src="https://codecov.io/gh/mingrammer/commonregex/branch/master/graph/badge.svg" /></a>
+    <a href="/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg"/></a>
+    <img alt="Github Test" src="https://github.com/zricethezav/gitleaks/actions/workflows/test.yml/badge.svg">  
+    <a href="https://goreportcard.com/report/github.com/mingrammer/commonregex"><img src="https://goreportcard.com/badge/github.com/mingrammer/commonregex"/></a>
+    <img src="https://img.shields.io/twitter/follow/zricethezav?label=Follow%20zricethezav&style=social&color=blue" alt="Follow @taotao01114978" />
 </p>
 <p align="center">
   A tool written in go to detect sensitive information
 </p>
 
-<br>
+## Introduction
+endoscopy is intended for scanning third-party libraries for sensitive information. It is capable of finding secrets accidentally committed to a git repo, additional credentials provided along with compromised credentials and secrets stored in plaintext/config files. The goal of this tool is to increase awareness regarding the types of sensitive information that are often accidentally shared.
 
 ## Usage
 ```
@@ -48,9 +48,7 @@ OPTIONS:
    --log value     log file path
    --output value  输出文件目录
    --help, -h      show help
-
 ```
-
 ## Installing
 
 ```
@@ -62,7 +60,6 @@ if you want build binary file, you can use this command
 ``` 
 ./build.sh
 ```
-
 ###  use go build
 ```
 go build -o endoscopy cmd/main.go
