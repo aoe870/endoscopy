@@ -51,16 +51,17 @@ OPTIONS:
    --help, -h      show help
 ```
 ## Installing
-
+###  use go get
 ```
 go get github.com/aoe870/endoscopy.git
 ```
 
-if you want build binary file, you can use this command
+if you want build binary file of all platform, you can use this command
 ###  use build shell script
 ``` 
 ./build.sh
 ```
+if you want build binary file of current platform, you can use this command
 ###  use go build
 ```
 go build -o endoscopy cmd/main.go

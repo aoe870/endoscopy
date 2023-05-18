@@ -2,6 +2,7 @@ package arge
 
 import (
 	"endoscopy/internal/logs"
+	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 	"os"
 	"path/filepath"
@@ -41,11 +42,14 @@ func New(c *cli.Context) error {
 					Path = dir[0 : len(dir)-1]
 				}
 			}
+		} else {
+			return errors.New("path is null")
 		}
 		Output = c.String("output")
 	} else {
 		//server
 		Address = os.Getenv("IP_SCA_PLATFORM")
+		Port = c.String("port")
 	}
 	//获取日志信息
 	Log = c.String("log")

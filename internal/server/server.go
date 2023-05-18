@@ -12,16 +12,16 @@ import (
 	"github.com/pkg/errors"
 )
 
-type server struct {
+type Server struct {
 	s       *gin.Engine
 	port    string
 	address string
 }
 
-func NewServer(adders, port string) *server {
+func NewServer(adders, port string) *Server {
 	logs.Info("Creating Server")
 	r := gin.Default()
-	s := &server{
+	s := &Server{
 		s:       r,
 		address: adders,
 		port:    port,
@@ -29,7 +29,7 @@ func NewServer(adders, port string) *server {
 	return s
 }
 
-func (s *server) RunServer() {
+func (s *Server) RunServer() {
 	//s.pool.Run()
 	s.s.GET("/", s.httpInit)
 	s.s.POST("endoscopy", s.httpPostAddTask)
@@ -40,11 +40,11 @@ func (s *server) RunServer() {
 	}
 }
 
-func (s *server) httpInit(c *gin.Context) {
+func (s *Server) httpInit(c *gin.Context) {
 	c.String(http.StatusOK, "hello go endoscopy")
 }
 
-func (s *server) httpPostAddTask(c *gin.Context) {
+func (s *Server) httpPostAddTask(c *gin.Context) {
 	param := HttpAddTask{}
 	err := c.BindJSON(&param)
 	if err != nil {

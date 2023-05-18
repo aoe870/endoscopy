@@ -45,13 +45,10 @@ type Info struct {
 	Content []string `json:"content"`
 }
 
-func (i *Info) To(table []rule.ScanResult) {
-
-	for _, result := range table {
-		for _, v := range result.Tags {
-			i.Source = result.Source
-			i.Content = append(i.Content, v.Content)
-		}
+func (i *Info) To(table rule.ScanResult) {
+	for _, v := range table.Tags {
+		i.Source = table.Source
+		i.Content = append(i.Content, v.Content)
 	}
 }
 
@@ -79,7 +76,6 @@ func New(conf Config) {
 	}
 
 	for _, r := range Rules {
-		scanTable := make([]rule.ScanResult, 0)
 		for _, f := range metadata.Table {
 			if f.Data == nil {
 				continue
@@ -88,15 +84,10 @@ func New(conf Config) {
 			if scan.Total <= 0 {
 				continue
 			}
-			scanTable = append(scanTable, scan)
+			var info Info
+			info.To(scan)
+			taskState.Info[r.GetRuleType()] = append(taskState.Info[r.GetRuleType()], info)
 		}
-
-		if len(scanTable) <= 0 {
-			continue
-		}
-		var info Info
-		info.To(scanTable)
-		taskState.Info[r.GetRuleType()] = append(taskState.Info[r.GetRuleType()], info)
 	}
 	taskState.ElapsedTime = time.Now().Sub(taskState.StartTime).String()
 	//TODO 保存结果
