@@ -3,8 +3,8 @@ package url
 import (
 	"endoscopy/internal/files"
 	"endoscopy/internal/rule"
-	"github.com/asaskevich/govalidator"
 	"regexp"
+	"strings"
 )
 
 type Rule struct {
@@ -14,7 +14,7 @@ type Rule struct {
 func New() Rule {
 	return Rule{
 		//匹配url正则
-		Regex: regexp.MustCompile(`(http|https|ftp|rtsp|mms|ws|wss)://[a-zA-Z0-9\\.?]+(/[a-zA-Z0-9]+)+`),
+		Regex: regexp.MustCompile(`(https?|ftp|rtsp|mms|wss?|HTTPS?|WSS?|FTP|RTSP)://[\S+(:\S*)?@)]+(/[a-zA-Z0-9\\.]+)?`),
 	}
 }
 
@@ -26,12 +26,12 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 
 	//检查是否符合规则
 	for _, match := range r.Regex.FindAllStringSubmatch(string(f.Data.Data), -1) {
-		if govalidator.IsURL(match[0]) {
-			result.Total++
-			result.Tags = append(result.Tags, rule.Tag{
-				Content: match[0],
-			})
-		}
+		url := strings.ReplaceAll(match[0], "\n", "")
+		url = strings.ReplaceAll(url, "\r", "")
+		result.Total++
+		result.Tags = append(result.Tags, rule.Tag{
+			Content: url,
+		})
 	}
 	return result
 }

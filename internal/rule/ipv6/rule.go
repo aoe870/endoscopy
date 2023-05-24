@@ -4,8 +4,7 @@ import (
 	"endoscopy/internal/files"
 	"endoscopy/internal/rule"
 	"regexp"
-
-	"github.com/asaskevich/govalidator"
+	"strings"
 )
 
 type Rule struct {
@@ -27,12 +26,12 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 
 	//检查是否符合规则
 	for _, match := range r.Regex.FindAllStringSubmatch(string(f.Data.Data), -1) {
-		if govalidator.IsIPv6(match[0]) {
-			result.Total++
-			result.Tags = append(result.Tags, rule.Tag{
-				Content: match[0],
-			})
-		}
+		ipv6 := strings.ReplaceAll(match[0], "\n", "")
+		ipv6 = strings.ReplaceAll(ipv6, "\r", "")
+		result.Total++
+		result.Tags = append(result.Tags, rule.Tag{
+			Content: ipv6,
+		})
 	}
 	return result
 }

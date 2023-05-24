@@ -5,6 +5,7 @@ import (
 	"endoscopy/internal/rule"
 	"github.com/asaskevich/govalidator"
 	"regexp"
+	"strings"
 )
 
 type Rule struct {
@@ -14,7 +15,7 @@ type Rule struct {
 func New() Rule {
 	return Rule{
 		//匹配邮箱正则
-		Regex: regexp.MustCompile(`[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+`),
+		Regex: regexp.MustCompile(`[\w\\._-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+`),
 	}
 }
 
@@ -27,9 +28,11 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 	//检查是否符合规则
 	for _, match := range r.Regex.FindAllStringSubmatch(string(f.Data.Data), -1) {
 		if govalidator.IsEmail(match[0]) {
+			email := strings.ReplaceAll(match[0], "\n", "")
+			email = strings.ReplaceAll(match[0], "\r", "")
 			result.Total++
 			result.Tags = append(result.Tags, rule.Tag{
-				Content: match[0],
+				Content: email,
 			})
 		}
 	}

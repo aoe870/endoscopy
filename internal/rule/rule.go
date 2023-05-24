@@ -11,6 +11,7 @@ const (
 	Ipv4  RuleType = "ipv4"
 	Ipv6  RuleType = "ipv6"
 	URL   RuleType = "url"
+	RSA   RuleType = "rsa"
 )
 
 type Rule interface {

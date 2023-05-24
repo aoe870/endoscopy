@@ -4,6 +4,7 @@ import (
 	"endoscopy/internal/files"
 	"endoscopy/internal/rule"
 	"regexp"
+	"strings"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -28,9 +29,11 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 	//检查是否符合规则
 	for _, match := range r.Regex.FindAllStringSubmatch(string(f.Data.Data), -1) {
 		if govalidator.IsIPv4(match[0]) {
+			ipv4 := strings.ReplaceAll(match[0], "\n", "")
+			ipv4 = strings.ReplaceAll(ipv4, "\r", "")
 			result.Total++
 			result.Tags = append(result.Tags, rule.Tag{
-				Content: match[0],
+				Content: ipv4,
 			})
 		}
 	}

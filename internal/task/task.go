@@ -8,6 +8,7 @@ import (
 	"endoscopy/internal/rule/email"
 	"endoscopy/internal/rule/ipv4"
 	"endoscopy/internal/rule/ipv6"
+	"endoscopy/internal/rule/ssh_rsa"
 	"endoscopy/internal/rule/url"
 	"fmt"
 	"github.com/goccy/go-json"
@@ -60,6 +61,7 @@ func New(conf Config) {
 		ipv4.New(),
 		ipv6.New(),
 		url.New(),
+		ssh_rsa.New(),
 	}
 	var taskState State
 	taskState.StartTime = time.Now()
