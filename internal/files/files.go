@@ -2,10 +2,12 @@ package files
 
 import (
 	"bytes"
+	"github.com/klauspost/compress/zip"
 	"github.com/mholt/archiver/v4"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type FileType int
@@ -40,26 +42,70 @@ func New(path string) (FileMetadata, error) {
 func (metadata *FileMetadata) readFile(prePath, path string) {
 
 	err := filepath.WalkDir(path, func(p string, d fs.DirEntry, err error) error {
-		Node := Node{
+		node := Node{
 			Name: d.Name(),
 			Path: p,
 		}
-		metadata.Table = append(metadata.Table, &Node)
+		metadata.Table = append(metadata.Table, &node)
 		if d.IsDir() {
-			Node.FileType = Ctalogue
+			node.FileType = Ctalogue
 			return nil
 		}
-		Node.FileType = File
+		node.FileType = File
 
 		// 判断是否为压缩文件
 		f, _ := os.Open(p)
 		fn, _ := f.Stat()
 		defer f.Close()
+
+		//zip单独处理
+		if filepath.Ext(p) == ".jar" ||
+			filepath.Ext(p) == ".war" {
+
+			//判断文件大小
+			if fn.Size() > 1*1024*1024*1024 {
+				return nil
+			}
+
+			//提取jar文件文件名，不包含jar后缀
+			zr, err := zip.NewReader(f, fn.Size())
+			if err != nil {
+				return nil
+			}
+			for _, zf := range zr.File {
+				if zf.Mode().IsDir() {
+					continue
+				}
+				fr, err := zf.Open()
+				defer fr.Close()
+				if err != nil {
+					return nil
+				}
+				buff := bytes.NewBuffer(make([]byte, 0, zf.FileInfo().Size()))
+				buff.ReadFrom(fr)
+				if strings.Contains(zf.Name, ".jar") {
+					continue
+				}
+				metadata.Table = append(metadata.Table, &Node{
+					Name:     zf.Name,
+					Path:     filepath.Base(p) + ":" + zf.Name,
+					FileType: File,
+					Data: &FileData{
+						Data: buff.Bytes(),
+					},
+				})
+			}
+			return nil
+		}
+
 		_, _, err = archiver.Identify(p, f)
 		if err != nil {
+			if fn.Size() > 1*1024*1024 {
+				return nil
+			}
 			buff := bytes.NewBuffer(make([]byte, 0, fn.Size()))
 			buff.ReadFrom(f)
-			Node.Data = &FileData{
+			node.Data = &FileData{
 				buff.Bytes(),
 			}
 		} else {
@@ -76,7 +122,7 @@ func (metadata *FileMetadata) readFile(prePath, path string) {
 				return err
 			}
 			metadata.Table = append(metadata.Table, table...)
-			Node.FileType = Archived
+			node.FileType = Archived
 		}
 
 		return nil

@@ -88,9 +88,8 @@ func readArchives(prePath, path string) ([]*Node, error) {
 			Name:     d.Name(),
 			FileType: File,
 			Path:     p,
-			Data:     new(FileData),
+			Data:     &FileData{buff.Bytes()},
 		}
-		copy(node.Data.Data, buff.Bytes())
 		if prePath != "" {
 			node.Path = prePath + ":" + node.Path
 		}
@@ -104,6 +103,7 @@ func readArchives(prePath, path string) ([]*Node, error) {
 	return fileList, nil
 }
 
+// 读取文件
 func decompressor(filename string) (string, error) {
 
 	temp := createTempDir()

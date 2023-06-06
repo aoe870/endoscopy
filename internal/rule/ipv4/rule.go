@@ -16,7 +16,7 @@ type Rule struct {
 func New() Rule {
 	return Rule{
 		//ipv4正则
-		Regex: regexp.MustCompile(`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`),
+		Regex: regexp.MustCompile(`^((0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])\.){3}(0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])$`),
 	}
 }
 
@@ -31,6 +31,9 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 		if govalidator.IsIPv4(match[0]) {
 			ipv4 := strings.ReplaceAll(match[0], "\n", "")
 			ipv4 = strings.ReplaceAll(ipv4, "\r", "")
+			if len(ipv4) > 18 {
+				continue
+			}
 			result.Total++
 			result.Tags = append(result.Tags, rule.Tag{
 				Content: ipv4,

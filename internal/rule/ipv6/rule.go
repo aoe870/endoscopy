@@ -3,6 +3,7 @@ package ipv6
 import (
 	"endoscopy/internal/files"
 	"endoscopy/internal/rule"
+	"github.com/asaskevich/govalidator"
 	"regexp"
 	"strings"
 )
@@ -28,6 +29,12 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 	for _, match := range r.Regex.FindAllStringSubmatch(string(f.Data.Data), -1) {
 		ipv6 := strings.ReplaceAll(match[0], "\n", "")
 		ipv6 = strings.ReplaceAll(ipv6, "\r", "")
+		if !govalidator.IsIPv6(ipv6) {
+			continue
+		}
+		if len(ipv6) < 4 {
+			continue
+		}
 		result.Total++
 		result.Tags = append(result.Tags, rule.Tag{
 			Content: ipv6,
