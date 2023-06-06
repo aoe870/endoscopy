@@ -16,7 +16,7 @@ type Rule struct {
 func New() Rule {
 	return Rule{
 		//ipv4正则
-		Regex: regexp.MustCompile(`^((0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])\.){3}(0|[1-9]\d?|1\d\d|2[0-4]\d|25[0-5])$`),
+		Regex: regexp.MustCompile(`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`),
 	}
 }
 
