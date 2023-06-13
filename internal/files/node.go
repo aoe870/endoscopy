@@ -71,6 +71,50 @@ func readArchives(prePath, path string) ([]*Node, error) {
 		}
 		buff.ReadFrom(fn)
 		fn.Close()
+
+		//zip单独处理
+		if filepath.Ext(p) == ".jar" ||
+			filepath.Ext(p) == ".war" {
+
+			//判断文件大小
+			if info.Size() > 1*1024*1024*1024 {
+				return nil
+			}
+
+			//提取jar文件文件名，不包含jar后缀
+			reader := bytes.NewReader(buff.Bytes())
+			buf := make([]byte, info.Size())
+			if _, err := reader.Read(buf); err != nil {
+				return nil
+			}
+			zr, err := zip.NewReader(reader, info.Size())
+			if err != nil {
+				return nil
+			}
+			for _, zf := range zr.File {
+				if zf.Mode().IsDir() {
+					continue
+				}
+				fr, err := zf.Open()
+				defer fr.Close()
+				if err != nil {
+					return nil
+				}
+				buff := bytes.NewBuffer(make([]byte, 0, zf.FileInfo().Size()))
+				buff.ReadFrom(fr)
+				if strings.Contains(zf.Name, ".jar") {
+					continue
+				}
+				fileList = append(fileList, &Node{
+					Name:     zf.Name,
+					FileType: Archived,
+					Path:     p,
+					Data:     &FileData{buff.Bytes()},
+				})
+			}
+			return nil
+		}
+
 		format, _, err := archiver.Identify(p, fn)
 		if format != nil {
 			path, _ := ioutil.TempDir("", "endoscopy-"+strings.ReplaceAll(p, "/", "-"))
