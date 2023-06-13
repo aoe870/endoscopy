@@ -107,15 +107,17 @@ func readArchives(prePath, path string) ([]*Node, error) {
 				}
 				fileList = append(fileList, &Node{
 					Name:     zf.Name,
-					FileType: Archived,
-					Path:     p,
+					FileType: File,
+					Path:     p + ":" + zf.FileInfo().Name(),
 					Data:     &FileData{buff.Bytes()},
 				})
 			}
 			return nil
 		}
 
-		format, _, err := archiver.Identify(p, fn)
+		newFile := NewFile()
+		_, err = newFile.Write(buff.Bytes())
+		format, _, err := archiver.Identify(p, newFile)
 		if format != nil {
 			path, _ := ioutil.TempDir("", "endoscopy-"+strings.ReplaceAll(p, "/", "-"))
 			path = filepath.Join(path, d.Name())
