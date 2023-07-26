@@ -7,11 +7,13 @@ import (
 type RuleType string
 
 const (
-	Email RuleType = "email"
-	Ipv4  RuleType = "ipv4"
-	Ipv6  RuleType = "ipv6"
-	URL   RuleType = "url"
-	RSA   RuleType = "rsa"
+	Email      RuleType = "email"
+	Ipv4       RuleType = "ipv4"
+	Ipv6       RuleType = "ipv6"
+	URL        RuleType = "url"
+	RSA        RuleType = "rsa"
+	API_KEY    RuleType = "api_key"
+	SECRET_KEY RuleType = "secret_key"
 )
 
 type Rule interface {

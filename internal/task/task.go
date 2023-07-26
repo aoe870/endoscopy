@@ -5,6 +5,7 @@ import (
 	"endoscopy/internal/logs"
 	"endoscopy/internal/report"
 	"endoscopy/internal/rule"
+	"endoscopy/internal/rule/api_key"
 	"endoscopy/internal/rule/email"
 	"endoscopy/internal/rule/ipv4"
 	"endoscopy/internal/rule/ipv6"
@@ -62,6 +63,7 @@ func New(conf Config) {
 		ipv6.New(),
 		url.New(),
 		ssh_rsa.New(),
+		api_key.New(),
 	}
 	var taskState State
 	taskState.StartTime = time.Now()
