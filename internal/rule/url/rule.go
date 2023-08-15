@@ -24,14 +24,13 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 	var result rule.ScanResult
 	result.Source = f.Path
 	result.RuleType = r.GetRuleType()
-
+	if strings.HasPrefix(f.Path, "inst/svg-term.js.gz:.") {
+		fmt.Println()
+	}
 	//检查是否符合规则
 	for _, match := range r.Regex.FindAllStringSubmatch(string(f.Data.Data), -1) {
 		url := strings.ReplaceAll(match[0], "\n", "")
 		url = strings.ReplaceAll(url, "\r", "")
-		if strings.HasPrefix(url, "http://ocsp.verisign.com") {
-			fmt.Println()
-		}
 		url = strings.Split(url, " ")[0]
 		result.Total++
 		result.Tags = append(result.Tags, rule.Tag{
