@@ -5,7 +5,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var Version = "v1.1.5"
+var Version = "v1.1.6"
 
 func RunVersion(c *cli.Context) error {
 	fmt.Println(Version)
