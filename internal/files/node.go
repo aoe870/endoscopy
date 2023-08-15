@@ -3,7 +3,6 @@ package files
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"io/fs"
 	"io/ioutil"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/klauspost/compress/zip"
 	"github.com/mholt/archiver/v4"
-	"github.com/pkg/errors"
 )
 
 type Node struct {
@@ -37,13 +35,11 @@ func (node *Node) readNode() {
 func readArchives(prePath, path string) ([]*Node, error) {
 
 	var fileList []*Node
-	ff, _ := os.Open(path)
-	fsys, err := FileSystem(context.Background(), path, ff)
+	system, err := archiver.FileSystem(context.Background(), path)
 	if err != nil {
 		return nil, err
 	}
-
-	err = fs.WalkDir(fsys, ".", func(p string, d fs.DirEntry, err error) error {
+	err = fs.WalkDir(system, ".", func(p string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
 		}
@@ -69,7 +65,7 @@ func readArchives(prePath, path string) ([]*Node, error) {
 			return nil
 		}
 		buff := bytes.NewBuffer(make([]byte, 0, info.Size()))
-		fn, err := fsys.Open(p)
+		fn, err := system.Open(p)
 		if err != nil {
 			return nil
 		}
@@ -122,10 +118,12 @@ func readArchives(prePath, path string) ([]*Node, error) {
 		newFile := NewFile()
 		_, err = newFile.Write(buff.Bytes())
 		format, _, err := archiver.Identify(p, newFile)
+		newFile.Close()
 		if format != nil {
 			path, _ := ioutil.TempDir("", "endoscopy-"+strings.ReplaceAll(p, "/", "-"))
 			path = filepath.Join(path, d.Name())
 			_, err := createFile(path, buff.Bytes())
+
 			if err == nil {
 				table, err := readArchives(p, path)
 				if err == nil {
@@ -171,7 +169,6 @@ func decompressor(filename string) (string, error) {
 			path == ".svn" {
 			return fs.SkipDir
 		}
-		fmt.Println("Walking:", path, "Dir?", d.IsDir())
 
 		tempPath := filepath.Join(temp, path)
 		if d.IsDir() {
@@ -204,40 +201,6 @@ func decompressor(filename string) (string, error) {
 		return temp, err
 	}
 	return temp, nil
-}
-
-func FileSystem(ctx context.Context, root string, file *os.File) (fs.FS, error) {
-
-	info, err := file.Stat()
-	format, _, err := archiver.Identify(filepath.Base(root), file)
-	if err != nil && !errors.Is(err, fmt.Errorf("no formats matched")) {
-		return nil, err
-	}
-
-	if format != nil {
-		switch ff := format.(type) {
-		case archiver.Zip:
-			// zip.Reader is more performant than ArchiveFS, because zip.Reader caches content information
-			// and zip.Reader can open several content files concurrently because of io.ReaderAt requirement
-			// while ArchiveFS can't.
-			// zip.Reader doesn't suffer from issue #330 and #310 according to local test (but they should be fixed anyway)
-
-			// open the file anew, as our original handle will be closed when we return
-			file, err := os.Open(root)
-			if err != nil {
-				return nil, err
-			}
-			return zip.NewReader(file, info.Size())
-		case archiver.Archival:
-			// TODO: we only really need Extractor and Decompressor here, not the combined interfaces...
-			return archiver.ArchiveFS{Path: root, Format: ff, Context: ctx}, nil
-		case archiver.Compression:
-			return archiver.FileFS{Path: root, Compression: ff}, nil
-		}
-	}
-
-	// otherwise consider it an ordinary file; make a file system with it as its only file
-	return archiver.FileFS{Path: root}, nil
 }
 
 func createFile(path string, data []byte) (*os.File, error) {
