@@ -15,7 +15,7 @@ type Rule struct {
 func New() Rule {
 	return Rule{
 		//匹配邮箱正则
-		Regex: regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`),
+		Regex: regexp.MustCompile(`[\w\\._-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+`),
 	}
 }
 

@@ -15,7 +15,7 @@ type Rule struct {
 func New() Rule {
 	return Rule{
 		//匹配url正则
-		Regex: regexp.MustCompile(`(https?|ftp|rtsp|mms|wss?|HTTPS?|WSS?|FTP|RTSP)://[\S+(:\S*)?@)]+(/[a-zA-Z0-9\\.]+)?`),
+		Regex: regexp.MustCompile(`(https?|ftp|rtsp|mms|wss?|HTTPS?|WSS?|FTP|RTSP)://[\S+(:\S*)?@)]+(/[a-zA-Z0-9\\.]+)+`),
 	}
 }
 

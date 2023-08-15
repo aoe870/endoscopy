@@ -2,6 +2,7 @@ package files
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/klauspost/compress/zip"
 	"github.com/mholt/archiver/v4"
 	"io/fs"
@@ -52,6 +53,10 @@ func (metadata *FileMetadata) readFile(prePath, path string) {
 			return nil
 		}
 		node.FileType = File
+
+		if p == "." {
+			fmt.Println()
+		}
 
 		// 判断是否为压缩文件
 		f, _ := os.Open(p)

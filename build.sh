@@ -20,7 +20,15 @@ mkdir $LinuxPath
 
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -a \
                 -gcflags="all=-trimpath=${PWD}" \
-                -o $LinuxPath/endoscopy cmd/main.go
+                -o $LinuxPath/endoscopy_amd cmd/main.go
+
+# Build the project to Linux
+LinuxPath=outPut/linux
+mkdir $LinuxPath
+
+CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -a \
+                -gcflags="all=-trimpath=${PWD}" \
+                -o $LinuxPath/endoscopy_arm cmd/main.go
 
 # Build the project to Mac
 MacPath=outPut/mac

@@ -59,6 +59,10 @@ func readArchives(prePath, path string) ([]*Node, error) {
 			return nil
 		}
 
+		if p == "." {
+			return nil
+		}
+
 		info, err := d.Info()
 		// 软链接类型不处理
 		if info.Mode().Type() == fs.ModeSymlink {
