@@ -3,7 +3,6 @@ package url
 import (
 	"endoscopy/internal/files"
 	"endoscopy/internal/rule"
-	"fmt"
 	"regexp"
 	"strings"
 )
@@ -15,7 +14,7 @@ type Rule struct {
 func New() Rule {
 	return Rule{
 		//匹配url正则
-		Regex: regexp.MustCompile(`(https?|ftp|rtsp|mms|wss?|HTTPS?|WSS?|FTP|RTSP)://[\S+(:\S*)?@)]+(/[a-zA-Z0-9\\.]+)+`),
+		Regex: regexp.MustCompile(`(?i)(http|https|ftp|rtsp|mms|wss?)://[a-zA-Z0-9]+[\.a-zA-Z0-9]*\.[a-zA-Z]{2,3}(/\S*)?`),
 	}
 }
 
@@ -24,9 +23,6 @@ func (r Rule) Check(f *files.Node) rule.ScanResult {
 	var result rule.ScanResult
 	result.Source = f.Path
 	result.RuleType = r.GetRuleType()
-	if strings.HasPrefix(f.Path, "inst/svg-term.js.gz:.") {
-		fmt.Println()
-	}
 	//检查是否符合规则
 	for _, match := range r.Regex.FindAllStringSubmatch(string(f.Data.Data), -1) {
 		url := strings.ReplaceAll(match[0], "\n", "")
