@@ -27,12 +27,6 @@ type FileData struct {
 	Data []byte
 }
 
-func (node *Node) readNode() {
-	if node.FileType == Ctalogue {
-		return
-	}
-}
-
 func readArchives(prePath, path string) ([]*Node, error) {
 
 	var fileList []*Node
