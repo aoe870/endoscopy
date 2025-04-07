@@ -14,6 +14,8 @@ func New() Rule {
 	return Rule{
 		//正则匹配
 		Regex: regexp.MustCompile(`API_KEY\s*=\s*["']?([A-Za-z0-9]{32})["']?`),
+		//写一个正则
+
 	}
 }
 

@@ -3,7 +3,6 @@ package files
 import (
 	"bytes"
 	"context"
-	"io"
 	"io/fs"
 	"io/ioutil"
 	"os"
@@ -16,10 +15,12 @@ import (
 )
 
 type Node struct {
-	Name     string
-	Path     string
-	FileType FileType
-	Data     *FileData
+	Name         string
+	Path         string
+	FileType     FileType
+	Data         *FileData
+	LocationPath string
+	IsFile       bool
 }
 
 type FileData struct {
@@ -40,22 +41,16 @@ func readArchives(prePath, path string) ([]*Node, error) {
 		return nil, err
 	}
 	err = fs.WalkDir(system, ".", func(p string, d fs.DirEntry, err error) error {
-		if err != nil {
+		if p == "." {
 			return nil
 		}
-		if p == ".git" {
-			return fs.SkipDir
-		}
-
-		if p == ".idea" {
+		if p == ".git" ||
+			p == ".idea" ||
+			p == ".svn" {
 			return fs.SkipDir
 		}
 
 		if d.IsDir() {
-			return nil
-		}
-
-		if p == "." {
 			return nil
 		}
 
@@ -149,58 +144,6 @@ func readArchives(prePath, path string) ([]*Node, error) {
 	}
 
 	return fileList, nil
-}
-
-// 读取文件
-func decompressor(filename string) (string, error) {
-
-	temp := createTempDir()
-	fsys, err := archiver.FileSystem(nil, filename)
-	if err != nil {
-		return temp, nil
-	}
-
-	err = fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if path == ".git" ||
-			path == ".idea" ||
-			path == ".svn" {
-			return fs.SkipDir
-		}
-
-		tempPath := filepath.Join(temp, path)
-		if d.IsDir() {
-			err = os.MkdirAll(tempPath, os.ModePerm)
-			if err != nil {
-				return nil
-			}
-		} else {
-			fr, err := fsys.Open(path)
-			defer fr.Close()
-			if err != nil {
-				return nil
-			}
-			// 创建要写出的文件对应的 Write
-			fw, err := os.OpenFile(tempPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0777)
-			defer fw.Close()
-			if err != nil {
-				return nil
-			}
-
-			_, err = io.Copy(fw, fr)
-			if err != nil {
-				return nil
-			}
-		}
-
-		return nil
-	})
-	if err != nil {
-		return temp, err
-	}
-	return temp, nil
 }
 
 func createFile(path string, data []byte) (*os.File, error) {
